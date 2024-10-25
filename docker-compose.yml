@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: mongo-assets
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ligne8
+      MONGO_INITDB_ROOT_PASSWORD: ligne8password
+    volumes:
+      - ./db_data:/data/db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_INITDB_ROOT_USERNAME: ligne8
+      MONGO_INITDB_ROOT_PASSWORD: ligne8password
