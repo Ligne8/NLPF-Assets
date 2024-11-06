@@ -8,9 +8,11 @@ import (
 
 	"NLPF-Assets/database"
 	"NLPF-Assets/models"
+
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type CreateLotRequest struct {
@@ -105,4 +107,34 @@ func CreateLot(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(lot)
+}
+
+func GetLotById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	lotId := vars["lot_id"]
+
+	collection := database.Client.Database("assets").Collection("lots")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	objID, err := primitive.ObjectIDFromHex(lotId)
+	if err != nil {
+		http.Error(w, "Invalid lot_id", http.StatusBadRequest)
+		return
+	}
+
+	filter := bson.M{"_id": objID}
+	var lot models.Lot
+	err = collection.FindOne(ctx, filter).Decode(&lot)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			http.Error(w, "Lot not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(lot)
 }
