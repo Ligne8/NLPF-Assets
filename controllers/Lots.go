@@ -1,14 +1,16 @@
 package controllers
 
 import (
-    "context"
-    "encoding/json"
-    "net/http"
-    "time"
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
 
-    "NLPF-Assets/database"
-    "NLPF-Assets/models"
-    "go.mongodb.org/mongo-driver/bson/primitive"
+	"NLPF-Assets/database"
+	"NLPF-Assets/models"
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateLotRequest struct {
@@ -18,6 +20,32 @@ type CreateLotRequest struct {
     MaxPrice          float64 `json:"max_price"`
     StartCheckpointId string  `json:"start_checkpoint_id"`
     EndCheckpointId   string  `json:"end_checkpoint_id"`
+}
+
+func GetLotsByClient(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    clientId := vars["client_id"]
+
+    collection := database.Client.Database("assets").Collection("lots")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    filter := bson.M{"client_id": clientId}
+    cursor, err := collection.Find(ctx, filter)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer cursor.Close(ctx)
+
+    var lots []models.Lot
+    if err = cursor.All(ctx, &lots); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(lots)
 }
 
 func CreateLot(w http.ResponseWriter, r *http.Request) {
