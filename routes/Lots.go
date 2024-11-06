@@ -12,6 +12,7 @@ func LotRoutes() {
     r.HandleFunc("/lots/clients/{client_id}", controllers.GetLotsByClient).Methods("GET")
 	r.HandleFunc("/lots/{lot_id}", controllers.GetLotById).Methods("GET")
 	r.HandleFunc("/lots/{lot_id}/status", controllers.UpdateLotStatus).Methods("PUT")
+	r.HandleFunc("/lots/{lot_id}/current_checkpoint", controllers.UpdateLotCurrentCheckpoint).Methods("PUT")
 
     http.Handle("/", r)
 }
