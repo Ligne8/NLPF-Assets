@@ -138,3 +138,44 @@ func GetLotById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(lot)
 }
+
+func UpdateLotStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	lotId := vars["lot_id"]
+
+	var req struct {
+		Status models.Status `json:"status"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	collection := database.Client.Database("assets").Collection("lots")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	objID, err := primitive.ObjectIDFromHex(lotId)
+	if err != nil {
+		http.Error(w, "Invalid lot_id", http.StatusBadRequest)
+		return
+	}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$set": bson.M{"status": req.Status}}
+	_, err = collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// return updated lot
+	var lot models.Lot
+	err = collection.FindOne(ctx, filter).Decode(&lot)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(lot)
+}
