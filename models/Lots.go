@@ -25,7 +25,7 @@ const (
 )
 
 type Lot struct {
-    Id                      primitive.ObjectID 	`bson:"_id,omitempty" json:"id"`
+    Id                      primitive.ObjectID 	`bson:"id,omitempty" json:"id"`
     ClientId                string              `bson:"client_id,omitempty" json:"client_id"`
     Status                  Status        	    `bson:"status,omitempty" json:"status"`
     Volume                  float64            	`bson:"volume,omitempty" json:"volume"`
