@@ -3,7 +3,6 @@ package main
 import (
 	"NLPF-Assets/database"
 	"NLPF-Assets/routes"
-	"fmt"
 	"log"
 	"net/http"
 )
