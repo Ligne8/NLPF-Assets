@@ -3,7 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Tractor struct {
-	Id          			primitive.ObjectID  `bson:"id,omitempty" json:"id" `
+	Id          			primitive.ObjectID  `bson:"_id,omitempty" json:"_id" `
 	ClientId 				string              `bson:"client_id,omitempty" json:"client_id"`	
 	TractorName 			string			  	`bson:"name,omitempty" json:"name"`
 	Status 					Status              `bson:"status,omitempty" json:"status"`
