@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,7 +15,16 @@ import (
 var Client *mongo.Client
 
 func ConnectDB() {
-    clientOptions := options.Client().ApplyURI("mongodb://ligne8:ligne8password@db-assets:27017/")
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+
+    databaseURL := os.Getenv("DATABASE_URL")
+    if databaseURL == "" {
+        log.Fatal("DATABASE_URL is not set in the environment")
+    }
+    clientOptions := options.Client().ApplyURI(databaseURL)
     client, err := mongo.NewClient(clientOptions)
     if err != nil {
         log.Fatal(err)
