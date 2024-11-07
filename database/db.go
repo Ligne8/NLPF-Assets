@@ -13,7 +13,7 @@ import (
 var Client *mongo.Client
 
 func ConnectDB() {
-    clientOptions := options.Client().ApplyURI("mongodb://ligne8:ligne8password@localhost:27017/directConnection=true")
+    clientOptions := options.Client().ApplyURI("mongodb://ligne8:ligne8password@mongo:27017/")
     client, err := mongo.NewClient(clientOptions)
     if err != nil {
         log.Fatal(err)
