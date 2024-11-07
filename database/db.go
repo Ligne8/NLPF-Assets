@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,11 +14,6 @@ import (
 var Client *mongo.Client
 
 func ConnectDB() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
-
     databaseURL := os.Getenv("DATABASE_URL")
     if databaseURL == "" {
         log.Fatal("DATABASE_URL is not set in the environment")
